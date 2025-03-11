@@ -1,24 +1,42 @@
 %option noyywrap
 %{
     #include<stdio.h>
-    int charCount = 0;
-    int wordCount = 0;
-    int lineCount = 0;
+    int length = 0;
+    int has_lower = 0;
+    int has_upper = 0;
+    int has_digit = 0;
+    int has_symbol = 0;
 %}
 
-/* Rule section */
+
+
 
 %%
-\n {charCount++; lineCount++; }
-[ \t]+ {charCount+= yyleng; }
-[a-zA-Z0-9]+  {wordCount++; charCount += yyleng;}
-. {charCount++;}
-%%
+([a-z]) { has_lower = 1; length++; }
+([A-Z]) { has_upper = 1; length++; }
+([0-9]) { has_digit = 1; length++; }
+[*;#$@] { has_symbol = 1; length++; }
+. { length++; }
 
-int main()
-{
+\n {
+    if (length < 9 || length > 15 || !has_lower || !has_upper || !has_digit || !has_symbol) {
+        printf("Invalid password\n");
+    } else {
+        printf("Valid password\n");
+    }
+    length = 0;
+    has_lower = 0;
+    has_upper = 0;
+    has_digit = 0;
+    has_symbol = 0;
+    return 0;
+}
+
+
+
+%%
+int main(){
     printf("Enter the string: ");
-    yylex(); 
-    printf("Character:%d\nWords:%d\nLine:%d\n", charCount, wordCount, lineCount);
+    yylex();
     return 0;
 }
